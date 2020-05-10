@@ -17,6 +17,7 @@ trait SlaService {
   }
 }
 
+// caching token - assuming fetching SLA can take a time
 trait SlaServiceCache extends SlaService {
 
   val tokensCache: mutable.Map[String, Sla] =  mutable.Map()
@@ -25,9 +26,6 @@ trait SlaServiceCache extends SlaService {
     if (tokensCache.contains(token)) {
       Future.successful(tokensCache(token))
     } else {
-      try {
-
-      }
       val tokenValue = super.getSlaByToken(token)
       tokenValue.map {
         sla =>
