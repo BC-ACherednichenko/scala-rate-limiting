@@ -8,11 +8,12 @@ import akka.http.scaladsl.server.Directives
 object WebServer extends Directives {
   def main(args: Array[String]) {
     val slaService = SlaService
-    val throttlingService: ThrottlingService = new Throttling(10, slaService) // todo take grace from YML
 
     implicit val system = ActorSystem()
     implicit val materializer = ActorMaterializer()
     implicit val executionContext = system.dispatcher
+    
+    val throttlingService: ThrottlingService = new Throttling(10, slaService) // todo take grace from YML
 
     // TODO add exception handler
     val route =
@@ -20,9 +21,7 @@ object WebServer extends Directives {
         get {
           pathPrefix("request") {
             // TODO get token from authorization header
-            if (throttlingService.isRequestAllowed(Some("6N2peswmp7IEFwiXxFWk"))) {
-              complete(StatusCodes.OK)
-            }
+            throttlingService.isRequestAllowed(Some("6N2peswmp7IEFwiXxFWk"))
             complete(StatusCodes.Unauthorized)
           }
         }

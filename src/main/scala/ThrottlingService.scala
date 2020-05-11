@@ -1,16 +1,7 @@
+import akka.actor.ActorSystem
+
 import scala.concurrent.{Await, ExecutionContext, Future, TimeoutException}
-import ExecutionContext.Implicits.global
-import scala.concurrent.duration._
 
-object Main {
-
-  def main(args: Array[String]) : Unit = {
-    val slaService = SlaService
-    val throttlingService = new Throttling(10, slaService)
-    throttlingService.isRequestAllowed(Some("6N2peswmp7IEFwiXxFWk"))
-    throttlingService.isRequestAllowed(Some("6N2peswmp7IEFwiXxFWk"))
-  }
-}
 
 trait ThrottlingService {
   val graceRps:Int // configurable move to yml
@@ -19,14 +10,15 @@ trait ThrottlingService {
   def isRequestAllowed(token: Option[String]): Future[Boolean]
 }
 
-class Throttling(val graceRps: Int, val slaService: SlaService) extends ThrottlingService {
-
-  val rpsCounter: RpsCounter = RpsCounter()
+class Throttling(val graceRps: Int, val slaService: SlaService) (implicit system: ActorSystem, ec: ExecutionContext) 
+  extends ThrottlingService {
+  
+  val rpsCounter: RpsLog = RpsLog(system, ec)
 
   override def isRequestAllowed(token: Option[String]): Future[Boolean] = {
     val result = for {
       sla <- slaService.getSlaByToken(token.getOrElse(""))
-      isValid = rpsCounter.hasReachedThreshold(sla) // todo it also could be a future
+      isValid = rpsCounter.hasReachedThreshold(sla) 
     } yield isValid
     result
   }

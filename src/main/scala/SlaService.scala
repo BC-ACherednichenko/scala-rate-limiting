@@ -40,7 +40,7 @@ object SlaService extends SlaService with SlaServiceCache {
 
   // stub data for tokens
   val users : Map[String, Sla] =  Map(
-    "6N2peswmp7IEFwiXxFWk" -> Sla(User(1, "test 1"), 5),
+    "6N2peswmp7IEFwiXxFWk" -> Sla(User(1, "test 1"), 2),
     "1UuD0G4NXVExEqJ12lkV" -> Sla(User(2, "test 2"), 8),
     "1K3s8Q1UGkz87jopiGn0" -> Sla(User(3, "test 3"), 10),
     "1K4s58Q1UGkz87jopiGn" -> Sla(User(3, "test 3"), 10)
